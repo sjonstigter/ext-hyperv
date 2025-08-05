@@ -42,14 +42,14 @@
         next_vlan_id: "{{ next_vlan_id[0] }}"
       when: (infoblox_major_version | int) == 1 and (infoblox_minor_version | int) >= 8
 
-#    - name: CREATE NEW VLAN IN INFOBLOX
-#      infoblox.nios_modules.nios_vlan:
-#        name: "{{ bd_name }}"
-#        id: "{{ next_vlan_id }}"
-#        parent: "{{ vlanrange_name }}"
-#        state: present
-#        provider: "{{ nios_provider }}"
-#      when: (infoblox_major_version | int) == 1 and (infoblox_minor_version | int) >= 8
+    - name: CREATE NEW VLAN IN INFOBLOX
+      infoblox.nios_modules.nios_vlan:
+        name: "{{ bd_name }}"
+        id: "{{ next_vlan_id }}"
+        parent: "{{ vlanrange_name }}"
+        state: present
+        provider: "{{ nios_provider }}"
+      when: (infoblox_major_version | int) == 1 and (infoblox_minor_version | int) >= 8
 
     - name: CREATE NEW VLAN THROUGH INFOBLOX WAPI FOR OLDER NIOS MODULE VERSION
       ansible.builtin.include_tasks: includes/create-vlan-infoblox_wapi.yml
@@ -101,3 +101,6 @@
         return_content: yes
         validate_certs: "{{ nios_provider.ssl_verify }}"
       when: (infoblox_major_version | int) == 1 and (infoblox_minor_version | int) < 8
+
+    - name: INCLUDE TO EXTEND HYPER-V TO OUR EPGS
+      ansible.builtin.include_tasks: includes/extend-epg-to-hyperv-aci.yml
