@@ -52,6 +52,11 @@
     data:
       "vlan": "{{ next_vlan_id }}"
 
+- name: CREATE JSON FILE FOR NEW VLAN
+  ansible.builtin.template:
+    src: templates/new-vlan.j2
+    dest: "vlan_{{ epg_name }}.json"
+
 - name: ADD VLAN TO NETWORK USING NEWER MODULE
   infoblox.nios_modules.nios_network:
     network: "{{ network_result[0].network }}"
