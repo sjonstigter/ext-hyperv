@@ -14,8 +14,23 @@
 - name: CREATE VLAN FOR OUR NETWORK
   block:
 
-    - name: GET THE INFOBLOX NIOS MODULE VERSION
-      ansible.builtin.include_tasks: get_infoblox_version.yml
+    - name: GET INFOBLOX.NIOS_MODULES VERSION
+      command: ansible-galaxy collection list infoblox.nios_modules
+      register: infoblox_collection_list
+      changed_when: false
+
+    - name: EXTRACT VERSION STRING (e.g., 1.8.0)
+      set_fact:
+        infoblox_version_str: "{{ (infoblox_collection_list.stdout | regex_search('infoblox\\.nios_modules\\s+(\\S+)', '\\1'))[0] }}"
+
+    - name: SPLIT VERSION INTO MAJOR AND MINOR
+      set_fact:
+        infoblox_major_version: "{{ infoblox_version_str.split('.')[0] }}"
+        infoblox_minor_version: "{{ infoblox_version_str.split('.')[1] }}"
+
+    - name: SHOW INFOBLOX VERSION
+      debug:
+        msg: "infoblox_major_version={{ infoblox_major_version }}, infoblox_minor_version={{ infoblox_minor_version }}"
 
     - name: GET NEXT FREE VLAN FOR OUR NETWORK FROM VLAN POOL
       set_fact:
@@ -27,14 +42,14 @@
         next_vlan_id: "{{ next_vlan_id[0] }}"
       when: (infoblox_major_version | int) == 1 and (infoblox_minor_version | int) >= 8
 
-    - name: CREATE NEW VLAN IN INFOBLOX
-      infoblox.nios_modules.nios_vlan:
-        name: "{{ bd_name }}"
-        id: "{{ next_vlan_id }}"
-        parent: "{{ vlanrange_name }}"
-        state: present
-        provider: "{{ nios_provider }}"
-      when: (infoblox_major_version | int) == 1 and (infoblox_minor_version | int) >= 8
+#    - name: CREATE NEW VLAN IN INFOBLOX
+#      infoblox.nios_modules.nios_vlan:
+#        name: "{{ bd_name }}"
+#        id: "{{ next_vlan_id }}"
+#        parent: "{{ vlanrange_name }}"
+#        state: present
+#        provider: "{{ nios_provider }}"
+#      when: (infoblox_major_version | int) == 1 and (infoblox_minor_version | int) >= 8
 
     - name: CREATE NEW VLAN THROUGH INFOBLOX WAPI FOR OLDER NIOS MODULE VERSION
       ansible.builtin.include_tasks: includes/create-vlan-infoblox_wapi.yml
