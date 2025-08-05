@@ -1,0 +1,88 @@
+---
+- name: Derive BD name from EPG
+  set_fact:
+    bd_name: "{{ epg_name | replace('epg_','bd_') }}"
+
+- name: LOOKUP NETWORK FOR REQUESTED EPG
+  set_fact:
+    network_result: "{{ lookup('infoblox.nios_modules.nios_lookup', 'network', filter={'comment': bd_name}, return_fields=['network'], provider=nios_provider, wantlist=True) }}"
+
+- name: DEBUG NETWORK RESULT
+  debug:
+    var: network_result[0].network
+
+- name: CREATE VLAN FOR OUR NETWORK
+  block:
+
+    - name: GET THE INFOBLOX NIOS MODULE VERSION
+      ansible.builtin.include_tasks: includes\get_infoblox_version.yml
+
+    - name: GET NEXT FREE VLAN FOR OUR NETWORK FROM VLAN POOL
+      set_fact:
+        next_vlan_id: "{{ lookup('infoblox.nios_modules.nios_next_vlan_id', parent=vlanrange_name, provider=nios_provider) }}"
+      when: (infoblox_major_version | int) == 1 and (infoblox_minor_version | int) >= 8
+
+    - name: SET NORMALISED VLAN VARIABLE NAME
+      set_fact:
+        next_vlan_id: "{{ next_vlan_id[0] }}"
+      when: (infoblox_major_version | int) == 1 and (infoblox_minor_version | int) >= 8
+
+    - name: CREATE NEW VLAN IN INFOBLOX
+      infoblox.nios_modules.nios_vlan:
+        name: "{{ bd_name }}"
+        id: "{{ next_vlan_id }}"
+        parent: "{{ vlanrange_name }}"
+        state: present
+        provider: "{{ nios_provider }}"
+      when: (infoblox_major_version | int) == 1 and (infoblox_minor_version | int) >= 8
+
+    - name: CREATE NEW VLAN THROUGH INFOBLOX WAPI FOR OLDER NIOS MODULE VERSION
+      ansible.builtin.include_tasks: includes\create-vlan-infoblox_legacy-version.yml
+      when: (infoblox_major_version | int) == 1 and (infoblox_minor_version | int) < 8
+
+    - name: STORE VLAN IN ANSIBLE STATS
+      ansible.builtin.set_stats:
+        data:
+          "vlan_{{ epg_name }}": "{{ next_vlan_id }}"
+
+- name: ADD VLAN TO THE NEW NETWORK
+  block:
+
+    - name: ADD VLAN TO NETWORK USING NEWER MODULE
+      infoblox.nios_modules.nios_network:
+        network: "{{ network_result[0].network }}"
+        vlans:
+          - name: "{{ bd_name }}"
+            parent: "{{ vlanrange_name }}"
+            id: "{{ next_vlan_id }}"
+        members:
+          - name: "infoblox.zero-days.nl"
+        state: present
+        provider: "{{ nios_provider }}"
+      when: (infoblox_major_version | int) == 1 and (infoblox_minor_version | int) >= 8
+
+    - name: SET FACT FOR NETWORK REFERENCE
+      set_fact:
+        network_ref: "{{ network_result[0]._ref }}"
+      when: (infoblox_major_version | int) == 1 and (infoblox_minor_version | int) < 8
+
+    - name: ADD VLAN TO NETWORK THROUGH WAPI (OLDER VERSION)
+      ansible.builtin.uri:
+        url: "https://{{ nios_provider.host }}/wapi/{{ wapi_version }}/{{ network_ref }}"
+        method: PUT
+        user: "{{ nios_provider.username }}"
+        password: "{{ nios_provider.password }}"
+        status_code: 200, 201
+        force_basic_auth: yes
+        body_format: json
+        body: |
+          {
+            "vlans": [
+              {
+                "vlan": "{{ vlan_full_ref }}"
+              }
+            ]
+          }
+        return_content: yes
+        validate_certs: "{{ nios_provider.ssl_verify }}"
+      when: (infoblox_major_version | int) == 1 and (infoblox_minor_version | int) < 8

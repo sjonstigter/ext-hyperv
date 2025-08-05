@@ -1,0 +1,24 @@
+---
+- hosts: nios
+  connection: local
+  name: ALLOCATE INFOBLOX VLANS FOR MULTIPLE EPGs
+
+  vars:
+    nios_provider:
+      host: "{{ inventory_hostname }}"
+      username: "{{ lookup('env', 'ANSIBLE_NET_USERNAME') }}"
+      password: "{{ lookup('env', 'ANSIBLE_NET_PASSWORD') }}"
+      ssl_verify: false
+    wapi_version: "v2.13"
+    vlanrange_name: "vlan_pool"
+    tenant_container:
+      shg: "10.221.0.0/16"
+      common: "10.229.0.0/16"
+      ss_22: "10.221.0.0/16"
+
+  tasks:
+    - name: PROCESS EACH EPG
+      include_tasks: includes\create-vlan-infoblox.yml
+      loop: "{{ epg_names }}"
+      loop_control:
+        loop_var: epg_name

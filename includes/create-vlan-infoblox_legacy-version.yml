@@ -1,0 +1,66 @@
+- name: GET VLAN POOL REFERENCE ID
+  ansible.builtin.uri:
+    url: "https://{{ nios_provider.host }}/wapi/{{ wapi_version }}/vlanrange?name={{ vlanrange_name }}"
+    method: GET
+    user: "{{ nios_provider.username }}"
+    password: "{{ nios_provider.password }}"
+    force_basic_auth: yes
+    return_content: yes
+    validate_certs: "{{ nios_provider.ssl_verify }}"
+  register: vlanrange_lookup
+
+- name: FAIL IF VLAN POOL NOT FOUND
+  ansible.builtin.fail:
+    msg: "VLAN view '{{ vlanrange_name }}' not found in Infoblox"
+  when: vlanrange_lookup.json | length == 0
+
+- name: SET VLAN POOL REFERENCE
+  ansible.builtin.set_fact:
+    vlanrange_ref: "{{ vlanrange_lookup.json[0]._ref }}"
+
+- name: REQUEST NEXT AVAILABLE VLAN ID
+  ansible.builtin.uri:
+    url: "https://{{ nios_provider.host }}/wapi/{{ wapi_version }}/{{ vlanrange_ref }}?_function=next_available_vlan_id"
+    method: POST
+    user: "{{ nios_provider.username }}"
+    password: "{{ nios_provider.password }}"
+    force_basic_auth: yes
+    body_format: json
+    body: |
+      {
+        "num": 1
+      }
+    return_content: yes
+    validate_certs: "{{ nios_provider.ssl_verify }}"
+  register: vlan_response
+
+- name: SET FACT FOR NEXT AVAILABLE VLAN ID
+  ansible.builtin.set_fact:
+    next_vlan_id: "{{ vlan_response.json.vlan_ids[0] }}"
+
+- name: SHOW NEXT AVAILABLE VLAN ID
+  ansible.builtin.debug:
+    msg: "The next available VLAN ID is {{ next_vlan_id }}"
+
+- name: CREATE NEW VLAN
+  ansible.builtin.uri:
+    url: "https://{{ nios_provider.host }}/wapi/{{ wapi_version }}/vlan"
+    method: POST
+    user: "{{ nios_provider.username }}"
+    password: "{{ nios_provider.password }}"
+    status_code: 200, 201
+    force_basic_auth: yes
+    body_format: json
+    body: |
+      {
+        "name": "{{ bd_name }}",
+        "parent": "{{ vlanrange_ref }}",
+        "id": {{ next_vlan_id }}
+      }
+    return_content: yes
+    validate_certs: "{{ nios_provider.ssl_verify }}"
+  register: vlan_create_response
+
+- name: SET FACT FOR FULL VLAN CODE
+  ansible.builtin.set_fact:
+    vlan_full_ref: "{{ vlan_create_response.json }}"
