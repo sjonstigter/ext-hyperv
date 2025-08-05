@@ -37,7 +37,7 @@
       when: (infoblox_major_version | int) == 1 and (infoblox_minor_version | int) >= 8
 
     - name: CREATE NEW VLAN THROUGH INFOBLOX WAPI FOR OLDER NIOS MODULE VERSION
-      ansible.builtin.include_tasks: includes\create-vlan-infoblox_legacy-version.yml
+      ansible.builtin.include_tasks: includes\create-vlan-infoblox_wapi.yml
       when: (infoblox_major_version | int) == 1 and (infoblox_minor_version | int) < 8
 
     - name: STORE VLAN IN ANSIBLE STATS
