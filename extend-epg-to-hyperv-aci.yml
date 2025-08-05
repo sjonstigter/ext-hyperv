@@ -1,0 +1,53 @@
+---
+- name: EXTEND EPG TO HYPERV
+  hosts: apic
+  connection: local
+  gather_facts: False
+
+  vars:
+      username: '{{ lookup("env", "ANSIBLE_NET_USERNAME") }}'
+      password: '{{ lookup("env", "ANSIBLE_NET_PASSWORD") }}'
+
+  tasks:
+    - name: BIND PHYSICAL HYPERV DOMAIN TO EPG
+      cisco.aci.aci_epg_to_domain:
+        host: "{{ inventory_hostname }}"
+        username: "{{ username }}"
+        password: "{{ password }}"
+        state: "present"
+        validate_certs: False
+        tenant: "{{ tenant }}"
+        ap: "{{ anp_name }}"
+        epg: "{{ epg_name }}"
+        domain: "dom_phys_hyperv"
+        domain_type: "phys"
+        suppress_verification: "true" # for testing purpose only
+        annotation: ""
+
+    - name: BIND EPG STATIC HYPERV PORTS
+      cisco.aci.aci_bulk_static_binding_to_epg:
+        host: "{{ inventory_hostname }}"
+        username: "{{ username }}"
+        password: "{{ password }}"
+        state: "present"
+        validate_certs: False
+        tenant: "{{ tenant }}"
+        ap: "{{ anp_name }}"
+        epg: "{{ epg_name }}"
+        encap_id: "{{ vlan }}"
+        interface_mode: trunk
+        interface_configs:
+          - interface: 1/1
+            leafs: 101
+            pod: 1
+          - interface: 1/1
+            leafs: 102
+            pod: 1
+          - interface: 1/8
+            leafs: 101
+            pod: 1
+          - interface: 1/8
+            leafs: 102
+            pod: 1
+        suppress_verification: "true" # for testing purpose only
+        annotation: ""
