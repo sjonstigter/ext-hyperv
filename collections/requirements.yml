@@ -3,5 +3,5 @@ collections:
   - name: cisco.aci
     version: 2.10.1
   - name: infoblox.nios_modules
-    version: 1.8.0
+    version: 1.5.0
   - name: ansible.netcommon
