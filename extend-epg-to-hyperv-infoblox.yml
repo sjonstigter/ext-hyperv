@@ -2,6 +2,7 @@
 - hosts: nios
   connection: local
   name: ALLOCATE INFOBLOX VLANS FOR MULTIPLE EPGs
+  gather_facts: False
 
   vars:
     nios_provider:
