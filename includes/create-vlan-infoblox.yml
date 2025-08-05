@@ -50,7 +50,7 @@
 - name: STORE VLAN IN ANSIBLE STATS
   ansible.builtin.set_stats:
     data:
-      "vlan": "{{ next_vlan_id }}"
+      "vlan_{{ epg_name }}": "{{ next_vlan_id }}"
 
 - name: ADD VLAN TO NETWORK USING NEWER MODULE
   infoblox.nios_modules.nios_network:
