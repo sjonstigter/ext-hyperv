@@ -50,7 +50,7 @@
 - name: STORE VLAN IN ANSIBLE STATS
   ansible.builtin.set_stats:
     data:
-      "vlan_{{ epg_name }}": "{{ next_vlan_id }}"
+      "vlan": "{{ next_vlan_id }}"
 
 - name: ADD VLAN TO NETWORK USING NEWER MODULE
   infoblox.nios_modules.nios_network:
@@ -90,3 +90,6 @@
     return_content: yes
     validate_certs: "{{ nios_provider.ssl_verify }}"
   when: (infoblox_major_version | int) == 1 and (infoblox_minor_version | int) < 8
+
+- name: EXTEND ACI EPG TO HYPER-V
+  ansible.builtin.include_tasks: includes/extend-epg-to-hyperv-aci.yml
