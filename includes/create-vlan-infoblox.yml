@@ -15,7 +15,7 @@
   block:
 
     - name: GET THE INFOBLOX NIOS MODULE VERSION
-      ansible.builtin.include_tasks: includes\get_infoblox_version.yml
+      ansible.builtin.include_tasks: includes/get_infoblox_version.yml
 
     - name: GET NEXT FREE VLAN FOR OUR NETWORK FROM VLAN POOL
       set_fact:
