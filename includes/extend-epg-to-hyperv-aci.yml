@@ -2,7 +2,6 @@
 - name: EXTEND EPG TO HYPERV
   hosts: apic
   connection: local
-  gather_facts: False
 
   vars:
       username: '{{ lookup("env", "ANSIBLE_NET_USERNAME") }}'
