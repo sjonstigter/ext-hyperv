@@ -4,9 +4,13 @@
     anp: "{{ epg_name.split('|')[1] }}"
     epg: "{{ epg_name.split('|')[2] }}"
 
+- name: CONVERT EPG NAME TO BD NAME
+  set_fact:
+    bd_name: "{{ epg | replace('epg_','bd_') }}"
+
 - name: READ JSON TEMPLATE INTO VARIABLE
   set_fact:
-    json_template: "vlan_{{ epg }}.json"
+    json_template: "vlan_{{ bd_name }}.json"
 
 - name: READ JSON TEMPLATE INTO VARIABLE
   set_fact:
