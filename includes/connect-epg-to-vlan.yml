@@ -19,7 +19,7 @@
       }}
 
 - debug:
-    msg: "VLAN ID for {{ target_vlan_name }} is {{ target_vlan_id }}"
+    msg: "VLAN ID for {{ bd_name }} is {{ target_vlan_id }}"
 
 - name: BIND PHYSICAL HYPERV DOMAIN TO EPG
   cisco.aci.aci_epg_to_domain:
