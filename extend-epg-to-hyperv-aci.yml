@@ -8,6 +8,26 @@
       password: '{{ lookup("env", "ANSIBLE_NET_PASSWORD") }}'
 
   tasks:
+    - name: SPLIT INPUT TO TENANT-ANP-EPG
+      set_fact:
+        tenant: "{{ epg_name.split('|')[0] }}"
+        anp: "{{ epg_name.split('|')[1] }}"
+        epg: "{{ epg_name.split('|')[2] }}"
+
+    - name: READ JSON TEMPLATE INTO VARIABLE
+      set_fact:
+        json_template: "vlan_{{ epg }}.json"
+
+    - name: READ JSON TEMPLATE INTO VARIABLE
+      set_fact:
+        vlan_data: "{{ lookup('file', json_template) | from_json }}"
+
+    - name: Show loaded variables
+      debug:
+        msg:
+          - "epg_name is {{ vlan_data.epg_name }}"
+          - "vlan is {{ vlan_data.vlan }}"
+
     - name: BIND PHYSICAL HYPERV DOMAIN TO EPG
       cisco.aci.aci_epg_to_domain:
         host: "{{ inventory_hostname }}"
@@ -16,8 +36,8 @@
         state: "present"
         validate_certs: False
         tenant: "{{ tenant }}"
-        ap: "{{ anp_name }}"
-        epg: "{{ epg_name }}"
+        ap: "{{ anp }}"
+        epg: "{{ epg }}"
         domain: "dom_phys_hyperv"
         domain_type: "phys"
         suppress_verification: "true" # for testing purpose only
@@ -31,9 +51,9 @@
         state: "present"
         validate_certs: False
         tenant: "{{ tenant }}"
-        ap: "{{ anp_name }}"
-        epg: "{{ epg_name }}"
-        encap_id: "{{ vlan }}"
+        ap: "{{ anp }}"
+        epg: "{{ epg }}"
+        encap_id: "{{ vlan_data.vlan }}"
         interface_mode: trunk
         interface_configs:
           - interface: 1/1
