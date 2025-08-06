@@ -1,0 +1,14 @@
+[nios]
+infoblox.zero-days.nl
+
+[apic]
+192.168.7.151
+
+[windows]
+192.168.7.202
+
+[windows:vars]
+ansible_port=5986
+ansible_connection=winrm
+ansible_winrm_transport=ntlm
+ansible_winrm_server_cert_validation=ignore
