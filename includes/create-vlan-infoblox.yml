@@ -1,7 +1,13 @@
 ---
+- name: SPLIT INPUT TO TENANT-ANP-EPG
+  set_fact:
+    tenant: "{{ epg_name.split('|')[0] }}"
+    anp: "{{ epg_name.split('|')[1] }}"
+    epg: "{{ epg_name.split('|')[2] }}"
+
 - name: Derive BD name from EPG
   set_fact:
-    bd_name: "{{ epg_name | replace('epg_','bd_') }}"
+    bd_name: "{{ epg | replace('epg_','bd_') }}"
 
 - name: LOOKUP NETWORK FOR REQUESTED EPG
   set_fact:
@@ -55,7 +61,7 @@
 - name: CREATE JSON FILE FOR NEW VLAN
   ansible.builtin.template:
     src: templates/new-vlan.j2
-    dest: "vlan_{{ epg_name }}.json"
+    dest: "vlan_{{ bd_name }}.json"
 
 - name: ADD VLAN TO NETWORK USING NEWER MODULE
   infoblox.nios_modules.nios_network:
