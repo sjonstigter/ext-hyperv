@@ -4,10 +4,10 @@ infoblox.zero-days.nl
 [apic]
 192.168.7.151
 
-[windows]
+[scvmm]
 192.168.7.202
 
-[windows:vars]
+[scvmm:vars]
 ansible_port=5986
 ansible_connection=winrm
 ansible_winrm_transport=ntlm

@@ -1,6 +1,6 @@
 ---
 - name: Add VLAN and subnet to SCVMM Logical Network
-  hosts: windows
+  hosts: scvmm
   gather_facts: no
   vars:
     scvmm_server: "192.168.7.202"
