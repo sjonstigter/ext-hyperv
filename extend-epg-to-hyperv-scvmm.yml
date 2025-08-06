@@ -1,0 +1,18 @@
+---
+- name: Add VLAN and subnet to SCVMM Logical Network
+  hosts: windows
+  gather_facts: no
+  vars:
+    scvmm_server: "192.168.7.202"
+    logical_network_name: "LogicalNetwork_SHG-HyperV-data"
+    network_site_name: "LogicalNetwork_SHG-HyperV-data"
+    hostgroup_name: "Datacenter"
+    vm_network_name: "{{ vmnetwork }}"
+    vm_subnet_name: "{{ vmnetwork }}_0"
+ 
+  tasks:
+    - name: PROCESS EACH EPG
+      include_tasks: includes/connect-vlan-to-scvmm.yml
+      loop: "{{ epg_names }}"
+      loop_control:
+        loop_var: epg_name  
