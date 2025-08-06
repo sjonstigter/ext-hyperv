@@ -1,11 +1,11 @@
 [nios]
-infoblox.zero-days.nl
+infoblox.infra.schipholgroupcloud.nl
 
 [apic]
-192.168.7.151
+apic1.infra.schipholgroupcloud.nl
 
 [scvmm]
-192.168.7.202
+sdiavmm1001.oneadacc.schipholgroupcloud.nl
 
 [scvmm:vars]
 ansible_port=5986
