@@ -31,6 +31,9 @@
 - name: SET VMNETWORK NAME
   set fact:
     vm_network_name: "[{{ tenant }}][{{ anp }}][{{ epg }}]"
+
+- name: SET VMNETWORK SUBNET NAME
+  set fact:
     vm_subnet_name: "[{{ tenant }}][{{ anp }}][{{ epg }}]_0"
 
 - name: Add VLAN and subnet
