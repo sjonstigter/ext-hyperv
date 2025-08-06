@@ -10,7 +10,7 @@
 
 - name: READ JSON TEMPLATE INTO VARIABLE
   set_fact:
-    json_template: "vlan_{{ bd_name }}.json"
+    json_template: "./vlan_{{ bd_name }}.json"
 
 - name: READ JSON TEMPLATE INTO VARIABLE
   set_fact:
