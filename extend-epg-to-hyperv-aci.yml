@@ -1,72 +1,20 @@
 ---
-- name: EXTEND EPG TO HYPERV
+- name: EXTEND EPG TO VLAN
   hosts: apic
   connection: local
+  gather_facts: false
 
   vars:
       username: '{{ lookup("env", "ANSIBLE_NET_USERNAME") }}'
       password: '{{ lookup("env", "ANSIBLE_NET_PASSWORD") }}'
+      tenant_container:
+        shg: "10.221.0.0/16"
+        common: "10.229.0.0/16"
+        ss_22: "10.221.0.0/16"
 
   tasks:
-    - name: SPLIT INPUT TO TENANT-ANP-EPG
-      set_fact:
-        tenant: "{{ epg_name.split('|')[0] }}"
-        anp: "{{ epg_name.split('|')[1] }}"
-        epg: "{{ epg_name.split('|')[2] }}"
-
-    - name: READ JSON TEMPLATE INTO VARIABLE
-      set_fact:
-        json_template: "vlan_{{ epg }}.json"
-
-    - name: READ JSON TEMPLATE INTO VARIABLE
-      set_fact:
-        vlan_data: "{{ lookup('file', json_template) | from_json }}"
-
-    - name: Show loaded variables
-      debug:
-        msg:
-          - "epg_name is {{ vlan_data.epg_name }}"
-          - "vlan is {{ vlan_data.vlan }}"
-
-    - name: BIND PHYSICAL HYPERV DOMAIN TO EPG
-      cisco.aci.aci_epg_to_domain:
-        host: "{{ inventory_hostname }}"
-        username: "{{ username }}"
-        password: "{{ password }}"
-        state: "present"
-        validate_certs: False
-        tenant: "{{ tenant }}"
-        ap: "{{ anp }}"
-        epg: "{{ epg }}"
-        domain: "dom_phys_hyperv"
-        domain_type: "phys"
-        suppress_verification: "true" # for testing purpose only
-        annotation: ""
-
-    - name: BIND EPG STATIC HYPERV PORTS
-      cisco.aci.aci_bulk_static_binding_to_epg:
-        host: "{{ inventory_hostname }}"
-        username: "{{ username }}"
-        password: "{{ password }}"
-        state: "present"
-        validate_certs: False
-        tenant: "{{ tenant }}"
-        ap: "{{ anp }}"
-        epg: "{{ epg }}"
-        encap_id: "{{ vlan_data.vlan }}"
-        interface_mode: trunk
-        interface_configs:
-          - interface: 1/1
-            leafs: 101
-            pod: 1
-          - interface: 1/1
-            leafs: 102
-            pod: 1
-          - interface: 1/8
-            leafs: 101
-            pod: 1
-          - interface: 1/8
-            leafs: 102
-            pod: 1
-        suppress_verification: "true" # for testing purpose only
-        annotation: ""
+    - name: PROCESS EACH EPG
+      include_tasks: includes/connect-epg-to-vlan.yml
+      loop: "{{ epg_names }}"
+      loop_control:
+        loop_var: epg_name
