@@ -53,10 +53,18 @@
   ansible.builtin.include_tasks: includes/create-vlan-infoblox_wapi.yml
   when: (infoblox_major_version | int) == 1 and (infoblox_minor_version | int) < 8
 
-- name: STORE VLAN IN ANSIBLE STATS
+#- name: STORE VLAN IN ANSIBLE STATS
+#  ansible.builtin.set_stats:
+#    data:
+#      vlan: 
+#        - vlan-name: "{{ bd_name }}"
+#          vlan-id: "{{ next_vlan_id }}"
+
+- name: Add VLAN entry
   ansible.builtin.set_stats:
     data:
-      "vlan": "{{ next_vlan_id }}"
+      vlan: "{{ (ansible_stats.vlan | default([])) + [ {'vlan-name': bd_name, 'vlan-id': next_vlan_id} ] }}"
+    aggregate: true
 
 - name: CREATE JSON FILE FOR NEW VLAN
   ansible.builtin.template:
