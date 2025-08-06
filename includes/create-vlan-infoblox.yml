@@ -5,7 +5,7 @@
     anp: "{{ epg_name.split('|')[1] }}"
     epg: "{{ epg_name.split('|')[2] }}"
 
-- name: Derive BD name from EPG
+- name: CONVERT EPG NAME TO BD NAME
   set_fact:
     bd_name: "{{ epg | replace('epg_','bd_') }}"
 
