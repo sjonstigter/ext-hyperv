@@ -8,23 +8,18 @@
   set_fact:
     bd_name: "{{ epg | replace('epg_','bd_') }}"
 
-- name: show templating results
-  ansible.builtin.debug:
-    msg: "{{ lookup('ansible.builtin.template', './vlan_{{ bd_name }}.json') }}"
-
-- name: READ JSON TEMPLATE INTO VARIABLE
+- name: GET OUR VLAN ID
   set_fact:
-    json_template: "./vlan_{{ bd_name }}.json"
+    target_vlan_id: >-
+      {{
+        (vlan
+        | selectattr('vlan-name', 'equalto', bd_name)
+        | map(attribute='vlan-id')
+        | list)[0]
+      }}
 
-- name: READ JSON TEMPLATE INTO VARIABLE
-  set_fact:
-    vlan_data: "{{ lookup('file', json_template) | from_json }}"
-
-- name: Show loaded variables
-  debug:
-    msg:
-      - "epg_name is {{ vlan_data.epg_name }}"
-      - "vlan is {{ vlan_data.vlan }}"
+- debug:
+    msg: "VLAN ID for {{ target_vlan_name }} is {{ target_vlan_id }}"
 
 - name: BIND PHYSICAL HYPERV DOMAIN TO EPG
   cisco.aci.aci_epg_to_domain:
@@ -51,7 +46,7 @@
     tenant: "{{ tenant }}"
     ap: "{{ anp }}"
     epg: "{{ epg }}"
-    encap_id: "{{ vlan_data.vlan }}"
+    encap_id: "{{ target_vlan_id }}"
     interface_mode: trunk
     interface_configs:
       - interface: 1/1
