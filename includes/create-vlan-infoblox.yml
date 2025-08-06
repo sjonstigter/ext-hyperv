@@ -63,6 +63,10 @@
     src: templates/new-vlan.j2
     dest: "vlan_{{ bd_name }}.json"
 
+- name: show templating results
+  ansible.builtin.debug:
+    msg: "{{ lookup('ansible.builtin.template', './vlan_{{ bd_name }}.json') }}"
+
 - name: ADD VLAN TO NETWORK USING NEWER MODULE
   infoblox.nios_modules.nios_network:
     network: "{{ network_result[0].network }}"
