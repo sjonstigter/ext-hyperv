@@ -7,8 +7,6 @@
     logical_network_name: "LogicalNetwork_SHG-HyperV-data"
     network_site_name: "LogicalNetwork_SHG-HyperV-data"
     hostgroup_name: "Datacenter"
-    vm_network_name: "{{ vmnetwork }}"
-    vm_subnet_name: "{{ vmnetwork }}_0"
  
   tasks:
     - name: PROCESS EACH EPG

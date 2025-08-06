@@ -28,6 +28,11 @@
         | list)[0]
       }}
 
+- name: SET VMNETWORK NAME
+  set fact:
+    vm_network_name: "[{{ tenant }}][{{ anp }}][{{ epg }}]"
+    vm_subnet_name: "[{{ tenant }}][{{ anp }}][{{ epg }}]_0"
+
 - name: Add VLAN and subnet
   ansible.windows.win_powershell:
     script: |
