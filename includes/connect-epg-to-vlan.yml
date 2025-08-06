@@ -8,6 +8,10 @@
   set_fact:
     bd_name: "{{ epg | replace('epg_','bd_') }}"
 
+- name: show templating results
+  ansible.builtin.debug:
+    msg: "{{ lookup('ansible.builtin.template', './vlan_{{ bd_name }}.json') }}"
+
 - name: READ JSON TEMPLATE INTO VARIABLE
   set_fact:
     json_template: "./vlan_{{ bd_name }}.json"
