@@ -18,9 +18,6 @@
         | list)[0]
       }}
 
-- debug:
-    msg: "VLAN ID for {{ bd_name }} is {{ target_vlan_id }}"
-
 - name: BIND PHYSICAL HYPERV DOMAIN TO EPG
   cisco.aci.aci_epg_to_domain:
     host: "{{ inventory_hostname }}"
@@ -49,17 +46,17 @@
     encap_id: "{{ target_vlan_id }}"
     interface_mode: trunk
     interface_configs:
-      - interface: 1/1
-        leafs: 101
-        pod: 1
-      - interface: 1/1
-        leafs: 102
+      - interface: 1/8
+        leafs: 125
         pod: 1
       - interface: 1/8
-        leafs: 101
+        leafs: 126
         pod: 1
-      - interface: 1/8
-        leafs: 102
-        pod: 1
+      - interface: 1/6
+        leafs: 231
+        pod: 2
+      - interface: 1/6
+        leafs: 232
+        pod: 2
     suppress_verification: "true" # for testing purpose only
     annotation: ""
