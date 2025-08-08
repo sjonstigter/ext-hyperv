@@ -53,7 +53,7 @@
   ansible.builtin.include_tasks: includes/create-vlan-infoblox_wapi.yml
   when: (infoblox_major_version | int) == 1 and (infoblox_minor_version | int) < 8
 
-- name: Add VLAN entry
+- name: ADD VLAN ENTRY TO ARTIFACT
   ansible.builtin.set_stats:
     data:
       vlan: "{{ (ansible_stats.vlan | default([])) + [ {'vlan-name': bd_name, 'vlan-id': next_vlan_id, 'subnet': network_result[0].network} ] }}"
