@@ -1,6 +1,6 @@
 - name: GET VLAN POOL REFERENCE ID
   ansible.builtin.uri:
-    url: "https://{{ nios_provider.host }}/wapi/{{ wapi_version }}/vlanrange?name={{ vlanrange_name }}"
+    url: "https://{{ nios_provider.host }}/wapi/{{ wapi_version }}/vlanrange?name={{ vlan_range(tenant) }}"
     method: GET
     user: "{{ nios_provider.username }}"
     password: "{{ nios_provider.password }}"
@@ -11,7 +11,7 @@
 
 - name: FAIL IF VLAN POOL NOT FOUND
   ansible.builtin.fail:
-    msg: "VLAN view '{{ vlanrange_name }}' not found in Infoblox"
+    msg: "VLAN view '{{ vlan_range(tenant) }}' not found in Infoblox"
   when: vlanrange_lookup.json | length == 0
 
 - name: SET VLAN POOL REFERENCE

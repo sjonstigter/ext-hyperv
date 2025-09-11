@@ -37,7 +37,7 @@
 
 - name: GET NEXT FREE VLAN FOR OUR NETWORK FROM VLAN POOL
   set_fact:
-    next_vlan_id: "{{ lookup('infoblox.nios_modules.nios_next_vlan_id', parent=vlanrange_name, provider=nios_provider) }}"
+    next_vlan_id: "{{ lookup('infoblox.nios_modules.nios_next_vlan_id', parent=vlan_range(tenant), provider=nios_provider) }}"
   when: (infoblox_major_version | int) == 1 and (infoblox_minor_version | int) >= 8
 
 - name: SET NORMALISED VLAN VARIABLE NAME
@@ -64,7 +64,7 @@
     network: "{{ network_result[0].network }}"
     vlans:
       - name: "{{ bd_name }}"
-        parent: "{{ vlanrange_name }}"
+        parent: "{{ vlan_range(tenant) }}"
         id: "{{ next_vlan_id }}"
     members:
       - name: "infoblox.zero-days.nl"

@@ -28,7 +28,7 @@
     tenant: "{{ tenant }}"
     ap: "{{ anp }}"
     epg: "{{ epg }}"
-    domain: "dom_phys_hyperv"
+    domain: "{{ aci_phys_dom(tenant) }}"
     domain_type: "phys"
     suppress_verification: "true" # for testing purpose only
     annotation: ""

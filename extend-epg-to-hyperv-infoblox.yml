@@ -16,6 +16,9 @@
       shg: "10.221.0.0/16"
       common: "10.229.0.0/16"
       ss_22: "10.221.0.0/16"
+    vlan_range:
+      shg: "vl_range_shg"
+      common: "vl_range_common"
 
   tasks:
     - name: PROCESS EACH EPG

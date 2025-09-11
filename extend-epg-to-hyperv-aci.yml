@@ -11,6 +11,9 @@
         shg: "10.221.0.0/16"
         common: "10.229.0.0/16"
         ss_22: "10.221.0.0/16"
+      aci_phys_dom:
+        shg: "dom_phys_sg"
+        common: "dom_phys_common"
 
   tasks:
     - name: PROCESS EACH EPG

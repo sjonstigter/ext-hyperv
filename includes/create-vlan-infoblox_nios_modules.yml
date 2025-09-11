@@ -2,7 +2,7 @@
   infoblox.nios_modules.nios_vlan:
     name: "{{ bd_name }}"
     id: "{{ next_vlan_id }}"
-    parent: "{{ vlanrange_name }}"
+    parent: "{{ vlan_range(tenant) }}"
     state: present
     provider: "{{ nios_provider }}"
   when: (infoblox_major_version | int) == 1 and (infoblox_minor_version | int) >= 8
