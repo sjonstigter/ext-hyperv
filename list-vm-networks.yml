@@ -34,4 +34,4 @@
 
     - name: Show parsed VM networks
       debug:
-        msg: "{{ vm_networks_output.output | from_json }}"
+        msg: "{{ vm_networks_output.output | join('') | from_json }}"
