@@ -13,10 +13,12 @@
     wapi_version: "v2.13"
     vlanrange_name: "vlan_pool"
     tenant_container:
+      mgmt: "10.220.0.0/16"
       shg: "10.221.0.0/16"
       common: "10.229.0.0/16"
       ss_22: "10.221.0.0/16"
     vlan_range:
+      mgmt: "vl_range_mgmt"
       shg: "vl_range_shg"
       common: "vl_range_common"
 
