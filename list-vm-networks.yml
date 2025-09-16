@@ -1,0 +1,20 @@
+---
+- name: List all SCVMM VM networks
+  hosts: scvmm
+  gather_facts: no
+  vars:
+    scvmm_server: "{{ inventory_hostname }}"
+ 
+  tasks:
+- name: Get all networks through Powershell
+  ansible.windows.win_powershell:
+    script: |
+      # Connect to the SCVMM server
+      $VMMServerName = "{{ scvmm_server }}"
+      Get-SCVMMServer -ComputerName $VMMServerName
+
+      # Get all VM Networks
+      $vmNetworks = Get-SCVMNetwork
+
+      # Display VM Network details
+      $vmNetworks | Select-Object Name, Description, LogicalNetwork, VMSubnetDefinitions | Format-Table -AutoSize
