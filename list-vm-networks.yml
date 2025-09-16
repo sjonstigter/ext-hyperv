@@ -6,15 +6,32 @@
     scvmm_server: "{{ inventory_hostname }}"
  
   tasks:
-  - name: Get all networks through Powershell
-    ansible.windows.win_powershell:
-      script: |
-        # Connect to the SCVMM server
-        $VMMServerName = "{{ scvmm_server }}"
-        Get-SCVMMServer -ComputerName $VMMServerName
+    - name: Get all networks through PowerShell
+      ansible.windows.win_powershell:
+        script: |
+          # Connect to the SCVMM server
+          $VMMServerName = "{{ scvmm_server }}"
+          $vmm = Get-SCVMMServer -ComputerName $VMMServerName
 
-        # Get all VM Networks
-        $vmNetworks = Get-SCVMNetwork
+          # Get all VM Networks
+          $vmNetworks = Get-SCVMNetwork -VMMServer $vmm
 
-        # Display VM Network details
-        $vmNetworks | Select-Object Name, Description, LogicalNetwork, VMSubnetDefinitions | Format-Table -AutoSize
+          # Prepare result output
+          $results = @()
+          foreach ($vmNet in $vmNetworks) {
+              $subnetNames = $vmNet.VMSubnetDefinitions | ForEach-Object { $_.Name } -join ", "
+              $results += [PSCustomObject]@{
+                  Name            = $vmNet.Name
+                  Description     = $vmNet.Description
+                  LogicalNetwork  = $vmNet.LogicalNetwork.Name
+                  Subnets         = $subnetNames
+              }
+          }
+
+          # Output the result
+          $results | ConvertTo-Json -Depth 3
+      register: vm_networks_output
+
+    - name: Show parsed VM networks
+      debug:
+        msg: "{{ vm_networks_output.output | from_json }}"
