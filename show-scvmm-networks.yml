@@ -1,0 +1,16 @@
+---
+- name: Debug - Show all SCVMM networks
+  hosts: scvmm
+  gather_facts: false
+
+  tasks:
+- name: Get SCVMM networks
+  ansible.windows.win_powershell:
+    script: |
+      # Import Powershell modules
+      if (-not (Get-Module -Name VirtualMachineManager)) {
+          Import-Module VirtualMachineManager
+      }
+
+      # Get networks
+      Get-SCVirtualNetwork
